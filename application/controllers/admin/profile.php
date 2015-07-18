@@ -1,5 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+require_once("./././api/cloudinary/Cloudinary.php");
+require_once("./././api/cloudinary/Uploader.php");
+require_once("./././api/cloudinary/Api.php");
+
+require_once("./././api/config_api_key.php");
+
 class Profile extends CI_Controller {
 
 	/**
@@ -18,9 +24,11 @@ class Profile extends CI_Controller {
 		    $session_data = $this->session->userdata('logged_in');
 		    $q = $this->user_model->get_by_id($session_data['id']);
 
+		    $path_image = !strpos($q->image, "cloudinary") ? base_url() . "assets/img/team/" . $q->image : $q->image;
+
 		    $img = "<div class='col-lg-4 col-md-6 col-xs-6 thumb'>";
-			$img .= "<a target='_blank' class='thumbnail' href='". base_url() . "assets/img/team/" . $q->image ."'>";
-			$img .= "<img class='img-responsive' src='". base_url() . "assets/img/team/" . $q->image ."'>";
+			$img .= "<a target='_blank' class='thumbnail' href='". $path_image ."'>";
+			$img .= "<img class='img-responsive' src='". $path_image ."'>";
 			$img .= "</a></div>";
 	 		$data = array("username" => $q->user_name,
 		 				"nama_lengkap" => $q->nama_lengkap,
@@ -36,6 +44,37 @@ class Profile extends CI_Controller {
 	 	}
 	}
 
+
+	 function upload_to_cdn($files) {
+	 	try {
+			if(isset($_POST['submit'])) {
+	 			$cloud = new \Cloudinary\Uploader();
+	 			$result = (object) $cloud->upload($files,
+	 					array("use_filename" => true)
+	 				);
+	 			if(!empty($result->signature)) {
+	 				return array("status" => 1, "secure_url" => $result->secure_url, "f" => "generate");
+	 			}
+	 		}
+		} catch(Exception $e) {
+			if(!empty($files))
+				return array("status" => 0, "error_message" => $e->getMessage());
+			return array("status" => 1, "f" => "default");
+		}
+	 }
+
+	 function delete_image_cdn($img) {
+		if(strpos($img, "cloudinary")) {
+ 			$x = explode("/", $img);
+ 			$y = explode(".", $x[count($x)-1]);
+ 			if($y[0] != "default") {
+ 				\Cloudinary\Uploader::destroy($y[0], 
+ 					array("invalidate" => true)
+ 				);	
+ 			}
+ 		}
+	 }
+
 	function update() {
 		if($this->session->userdata('logged_in')) {
 		    $session_data = $this->session->userdata('logged_in');
@@ -44,26 +83,27 @@ class Profile extends CI_Controller {
 	        $this->validation("update_profile");
 
 	        if($this->form_validation->run() == true) {
-	 			$t = $this->upload();
+	 			//$t = $this->upload();
+
+			 	$t = $this->upload_to_cdn($_FILES['userfile']['tmp_name']);
 
 			 	if(isset($_POST['submit'])) {
 			 		$d = $this->input->post(null, true);
 			 		unset($d['submit']);
 			 		$q = $this->user_model->get_by_id($d['user_id']);
-			 		if($t['is_uploaded']) {
-			 			$d['image'] = $t['data']['file_name'];
+			 		if($t['status'] == 1 && $t['f'] == "generate") {
+			 			$d['image'] = $t['secure_url']; //$t['data']['file_name'];
 			 			if($q->image != null) {
 			 				//unlink(base_url() . "assets/img/team/" . $q->image);
+			 				$this->delete_image_cdn($q->image);
 			 			} 
-			 		} else if(!$t['is_uploaded']) {
-			 			if(empty($t['data']['file_name'])) {
-			 				$d['image'] = $q->image == null ? "default.jpg" : $q->image;
-			 			} else {
-			 				$data = array("error_message" => "<span style='color:red'>" . $t['error_message'] . "</span>");
-		 					$this->session->set_userdata("error_message", $data['error_message']);
-		 					redirect("admin/profile/update");	
-			 			}	
-			 		}
+			 		} else if($t['status'] == 1 && $t['f'] == "default") {
+			 			$d['image'] = $q->image == null ? $default : $q->image;
+			 		} else if($t['status'] == 0) {
+		 				$data = array("error_message" => "<span style='color:red'>" . $t['error_message'] . "</span><br><br>");
+	 					$this->session->set_userdata("error_message", $data['error_message']);
+	 					redirect("admin/profile/update");	
+			 		}	
 
 			 		$this->user_model->update_user($d['user_id'], $d);
 			 		$t = array("success" => true,

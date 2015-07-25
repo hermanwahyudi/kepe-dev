@@ -184,7 +184,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = (strpos($config['base_url'], 'localhost') || strpos($config['base_url'], '127.0.0.1')) ? 0 : 1;
 
 /*
 |--------------------------------------------------------------------------

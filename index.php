@@ -18,7 +18,13 @@
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-	define('ENVIRONMENT', 'development');
+$host = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ?  "https" : "http");
+$host .=  "://".$_SERVER['HTTP_HOST'];
+$host .=  str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']);
+
+$ENV = !strpos($host, 'localhost') || !strpos($host, '127.0.0.1') ? 'production' : 'development';
+	
+define('ENVIRONMENT', $ENV);
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING

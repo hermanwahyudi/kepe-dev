@@ -24,11 +24,15 @@ class Contact extends CI_Controller {
 	
 	public function generate($view, $content = array())
 	{
-		$data = $content;
-		$data['slider'] = "";
-		$data['header']  = $this->parser->parse('templates/header', $content, TRUE);
-		$data['content']  = $this->parser->parse($view, $content, TRUE);
-		$data['footer']  = $this->parser->parse('templates/footer', $content, TRUE);
+		$data = array(
+			'slider' => $this->menu->get_page_title($content['title']),
+			'map' => NULL,
+			'header' => $this->parser->parse('templates/header', $content, TRUE),
+			'content' => $this->parser->parse($view, $content, TRUE),
+			'footer' => $this->parser->parse('templates/footer', $content, TRUE)
+		);
+		
+		$data = array_merge($content, $data);
 		
 		$this->parser->parse('index', $data);
 	}
@@ -57,7 +61,7 @@ class Contact extends CI_Controller {
 			$this->email->from('hi@kepoabis.com', 'Hi');
 			$this->email->to($email);
 
-			$this->email->subject($subject);
+			$this->email->subject("[KONFIRMASI]");
 			$this->email->message("<p>
 					Dear ".$name.",
 					<br>
@@ -68,7 +72,7 @@ class Contact extends CI_Controller {
 					<br>
 					<br>Jalan Pelita RT 02/09 No. 69 Kel. Tengah, Kec. Kramat Jati, Jakarta Timur 13540, Indonesia
 					<br><a href='http://kepoabis.com'>KepoAbis.com</a> by Haamill Productions
-					<br><p>Phone: 085697309204
+					<br>Phone: 085697309204
 					<br>Email: hi@kepoabis.com
 				</p>");
 			
@@ -87,11 +91,12 @@ class Contact extends CI_Controller {
 		}
 		
 		$data = array_merge(
-			array('sending_message' => base_url('contact/view/1')),
-			array('alert' => $alert),
 			array(
 				'get_menu' => $this->menu->get_menu("header", "contact"),
 				'get_breadcrumb' => $this->menu->get_menu("breadcrumb", "contact"),
+				'sending_message' => base_url('contact/view/1'),
+				'alert' => $alert,
+				"title" => 'Contact Us'
 			),
 			$this->profile()->get_about_detail()
 		);

@@ -37,14 +37,16 @@
 | in the URL cannot be matched to a valid route.
 |
 */
-$is_maintenance = false;
+$is_maintenance = true;
 
 $route['default_controller'] = (!$is_maintenance) ? "home" : "maintenance";
 $route['admin'] = "admin/dashboard/index";
 $route['category-article'] = "admin/category_article";
 $route['category-news'] = "admin/category_news";
 $route['category-video'] = "admin/category_video";
-$route['404_override'] = '';
+$route['comment-notif'] = "admin/comment_notif";
+$route['static-content'] = "admin/static_content";
+$route['404_override'] = 'Page_404';
 
 
 /* End of file routes.php */

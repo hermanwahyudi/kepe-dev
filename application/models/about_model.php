@@ -30,6 +30,13 @@ class About_model extends CI_Model {
 			,contact_facebook
 			,contact_twitter
 			,contact_googleplus
+			,contact_youtube
+			,contact_instagram
+			,contact_path
+			,content_title
+			,content_body
+			,content_mission
+			,content_image
 			,created_year
 			,version
 			,footer'
@@ -39,7 +46,7 @@ class About_model extends CI_Model {
         $this->db->limit(1);
 
         $query = $this->db->get();
-
+		
         if($query->num_rows() == 1) {
             return $query->row();
         } return false;
@@ -54,5 +61,32 @@ class About_model extends CI_Model {
     function insert_new($data) {
     	$this->db->insert('setting', $data);
     	return 1;
+    }
+	
+	function get_static_content($parameter = 'history') {
+        $this->db->select('
+			sc.static_content_id
+			,sc.user_id
+			,sc.title
+			,sc.tag
+			,sc.parameter
+			,sc.summary
+			,sc.body
+			,sc.status
+			,sc.created_date
+			,sc.modified_date
+			,usr.nama_lengkap AS full_name'
+		);
+		
+        $this->db->from('static_content sc');
+		$this->db->join('user as usr', 'usr.user_id = sc.user_id', 'left');
+        $this->db->where("parameter = '".$parameter."'");
+        $this->db->limit(1);
+
+        $query = $this->db->get();
+		
+        if($query->num_rows() == 1) {
+            return $query->row();
+        } return false;
     }
 }

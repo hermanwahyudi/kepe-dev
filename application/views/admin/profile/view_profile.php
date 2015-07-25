@@ -63,22 +63,25 @@
                 </div>
                 <!-- /.row -->
                 <h2>My Profile</h2><br>
-                <div class="col-lg-8">
+                <div class="col-lg-12">
                     <div class="row clearfix">
-                        <div class="col-md-12 column"> <br>
+                        <div> 
+						<br>
                             <table class="table">
                                 <tbody>
-                                <td>
                                     <tr>{image}</tr>
-                                </td>
-                                <td>
                                     <tr>
-                                        <td align="left"><strong>Username</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{username}   
-                                    </td>
-                                        
+                                        <td align="left"  class="col-md-2 column"><strong>Username</strong></td><td align="left"  class="col-md-10 column">:&nbsp;&nbsp;&nbsp;{username}   
+                                    </td>  
                                     </tr>
                                     <tr>
                                         <td align="left"><strong>Nama<strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{nama_lengkap} </td>
+                                    </tr>
+									<tr>
+                                        <td align="left"><strong>Date Of Birth<strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{date_of_birth} </td>
+                                    </tr>
+									<tr>
+                                        <td align="left"><strong>Phone Number<strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{phone_number} </td>
                                     </tr>
                                     <tr>
                                         <td align="left"><strong>Role</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{role} </td>
@@ -86,13 +89,18 @@
                                     <tr>
                                         <td align="left"><strong>Email</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{email}</td>
                                     </tr>
+									<tr>
+                                        <td align="left"><strong>Place Of Birth<strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{place_of_birth} </td>
+                                    </tr>
+									<tr>
+                                        <td align="left"><strong>Address<strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{address} </td>
+                                    </tr>
                                     <tr>
                                         <td align="left"><strong> Position </strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{position}</td>
                                     </tr>
                                     <tr>
                                         <td align="left"><strong>Description</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{description}</td>
                                     </tr>
-                                </td>
                                 </tbody>
                             </table>
                             <a class="btn btn-primary" href='<?php echo base_url(); ?>admin/profile/update'>Edit</a>&nbsp;

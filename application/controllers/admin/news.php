@@ -36,10 +36,14 @@ class News extends CI_Controller {
 	function get_list_news($start, $limit, $keyword='') {
 		$result = $this->news_model->get_news_list(0, $start, $limit, $keyword);
 	 	$data_array = ""; $i = 1;
+		$number = 0;
+		
 	 	if($result) {
 	 		foreach($result as $row) {
+				$number =  $start + $i;
+				
 		 		$id = $row->news_id;
-	        	$data_array .= "<tr><td>" . $id . "</td>";
+	        	$data_array .= "<tr><td>" . $number . "</td>";
 	        	$data_array .= "<td>" . $row->title_category . "</td>";
 	        	$data_array .= "<td>" . $row->title_news . "</td>";
 	        	$data_array .= "<td>" . $row->status . "</td>";
@@ -156,6 +160,7 @@ class News extends CI_Controller {
 		$uploaded = $this->upload->do_upload();
 		$data = $this->upload->data();
 		if($uploaded) {
+			chmod($data['full_path'], 0777);
 			return array("is_uploaded" => true, 
 					"data" => $data);
 		} return array("is_uploaded" => false, 

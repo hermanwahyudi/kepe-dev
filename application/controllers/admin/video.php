@@ -90,10 +90,14 @@ class Video extends CI_Controller {
 	function get_list_video($start, $limit) {
 	 	$result = $this->video_model->get_video_list(0, $start, $limit);
 	 	$data_array = ""; $i = 1;
+		$number = 0;
+		
 	 	if($result) {
 	 		foreach($result as $row) {
+				$number =  $start + $i;
+				
 		 		$id = $row->video_id;
-	        	$data_array .= "<tr><td>" . $id . "</td>";
+	        	$data_array .= "<tr><td>" . $number . "</td>";
 	        	$data_array .= "<td>" . $row->title_category . "</td>";
 	        	$data_array .= "<td>" . $row->title_video . "</td>";
 	        	$data_array .= "<td>" . $row->status . "</td>";
@@ -156,7 +160,7 @@ class Video extends CI_Controller {
 			 	if(isset($_POST['submit'])) {
 			 		$d = $this->input->post(null, true);
 			 		unset($d['submit']);
-			 		$q = $this->image_model->get_by_id($d['image_id']) ? $this->image_model->get_by_id($d['image_id']) : "";
+			 		$q = $this->image_model->get_by_id($d['image_id']) ? $this->image_model->get_by_id($d['image_id']) : (object) array("path" => "", "size" => 0);
 			 		$img_data = array("name" => $q->path, 
 								"size" => $q->size);
 					if($t['is_uploaded']) {
@@ -199,12 +203,15 @@ class Video extends CI_Controller {
 	                    "tag" => $q->tag,
 	                    "status" => $q->status,
 	                    "description" => $q->description,
+	                    "producer" => $q->producer,
 	                    "story_ide" => $q->story_ide,
 	                    "screenwriter" => $q->screenwriter,
 	                    "film_director" => $q->film_director,
 	                    "cameramen" => $q->cameramen,
 	                    "artist" => $q->artist,
 	                    "url" => $q->url,
+	                    "host" => $q->host,
+	                    "editor" => $q->editor,
 	                    "duration" => $q->duration,
 	                    "image" => $img['path'],
 	                    "image_id" => $img['image_id'], 
@@ -242,11 +249,14 @@ class Video extends CI_Controller {
 	                    "tag" => $q->tag,
 	                    "status" => $q->status,
 	                    "description" => $q->description,
+	                    "producer" => $q->producer,
 	                    "story_ide" => $q->story_ide,
 	                    "screenwriter" => $q->screenwriter,
 	                    "film_director" => $q->film_director,
 	                    "cameramen" => $q->cameramen,
 	                    "artist" => $q->artist,
+						"host" => $q->host,
+	                    "editor" => $q->editor,
 	                    "url" => "<iframe width='420' height='345'src='http://www.youtube.com/embed/". $youtube_id ."'></iframe> ",
 	                    "duration" => $q->duration,
 	                    "image" => $img,

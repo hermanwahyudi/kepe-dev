@@ -26,6 +26,13 @@
     </div>
 </div>
 <div class="form-group">
+    <label class="col-sm-2">Producer</label>
+    <div class="col-sm-6">
+        <?php $producer = ($flag == "update") ? $producer : ""; ?>
+        <input type="text" class="form-control" value="<?php echo $producer; ?>" name="producer">
+    </div>
+</div>
+<div class="form-group">
     <label class="col-sm-2">Story Ide</label>
     <div class="col-sm-6">
         <?php $story_ide = ($flag == "update") ? $story_ide : ""; ?>
@@ -58,6 +65,20 @@
     <div class="col-sm-6">
         <?php $artist = ($flag == "update") ? $artist : ""; ?>
         <textarea class="form-control" rows="4" value="<?php echo $artist; ?>" name="artist"><?php echo $artist; ?></textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2">Host</label>
+    <div class="col-sm-6">
+        <?php $host = ($flag == "update") ? $host : ""; ?>
+        <input type="text" class="form-control" value="<?php echo $host; ?>" name="host">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2">Editor</label>
+    <div class="col-sm-6">
+        <?php $editor = ($flag == "update") ? $editor : ""; ?>
+        <input type="text" class="form-control" value="<?php echo $editor; ?>" name="editor">
     </div>
 </div>
 <div class="form-group">

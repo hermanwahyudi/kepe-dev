@@ -78,13 +78,25 @@
                                         
                                     </tr>
                                     <tr>
-                                        <td align="left"><strong>Nama<strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{nama_lengkap} </td>
+                                        <td align="left"><strong>Name<strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{nama_lengkap} </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left"><strong>Date of Birth</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{date_of_birth}</td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left"><strong>Place of Birth</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{place_of_birth}</td>
                                     </tr>
                                     <tr>
                                         <td align="left"><strong>Role</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{role} </td>
                                     </tr>
                                     <tr>
                                         <td align="left"><strong>Email</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{email}</td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left"><strong>Phone Number</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{phone_number}</td>
+                                    </tr>
+                                    <tr>
+                                        <td align="left"><strong>Address</strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{address}</td>
                                     </tr>
                                     <tr>
                                         <td align="left"><strong> Position </strong></td><td align="left">:&nbsp;&nbsp;&nbsp;{position}</td>

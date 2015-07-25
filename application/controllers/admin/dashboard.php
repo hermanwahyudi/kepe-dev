@@ -61,6 +61,32 @@ class Dashboard extends CI_Controller {
 		}
 	}
 
+	function get_stat($year='') {		
+		$stat = array("Home" => $this->get_data($year),
+					"Article" => $this->get_data($year),
+					"News" => $this->get_data($year),
+					"Videografi" => $this->get_data($year)
+			);
+		echo json_encode($stat);
+	}
+
+	function get_data($year='') {
+		return array(
+			array("label" => "January", "y" => rand(10, 40)),
+			array("label" => "February", "y" => rand(10, 40)),
+			array("label" => "March", "y" => rand(10, 40)),
+			array("label" => "April", "y" => rand(10, 40)),
+			array("label" => "May", "y" => rand(10, 40)),
+			array("label" => "June", "y" => rand(10, 40)),
+			array("label" => "July", "y" => rand(10, 40)),
+			array("label" => "August", "y" => rand(10, 40)),
+			array("label" => "September", "y" => rand(10, 40)),
+			array("label" => "October", "y" => rand(10, 40)),
+			array("label" => "November", "y" => rand(10, 40)),
+			array("label" => "December", "y" => rand(10, 40))
+		);
+	}
+
 	function logout() {
 	   	$this->session->unset_userdata('logged_in');
 	   	//session_destroy();

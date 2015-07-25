@@ -8,22 +8,25 @@
 		</ol>
 	</div>
 </div>
-<div class="col-md-8 blog-main">
+<div class="col-md-8">
 	<div class="row">
-		{get_article}
-		<div class="col-md-6">
-			<div class="recent_post">
-				<div>
-					{title}
-					{image}
-					<p>
-						{summary}
-					</p>
-				</div>
-			</div>                	 
-		</div>
-		{/get_article}
 		<div class="col-md-12">
+			{get_article}
+			<div class="post">
+				<h2 class="post-title">{title}</h2>
+				<p class="post-body">
+					On {created_date} By {full_name}
+				</p>
+				{image}
+				<p>
+					<i class="glyphicon glyphicon-comment"></i>&nbsp;{count_article_comment} comment | 
+					<i class="glyphicon glyphicon-stats"></i>&nbsp;{count_article_stat} views
+				</p>
+				{summary}
+				{tag}
+			</div>
+			{read_more}
+			{/get_article}
 			<div style="text-align: center;">
 				{page}
 			</div>
@@ -32,15 +35,15 @@
 </div>
 <div class="col-md-4">
 	<div class="sidebar-module">
-		<h5 style="font-weight: 400; font-size: 24px;">Category</h5>
-		<ol class="list-unstyled">
+		<h2 class="title">Category</h2>
+		<ol class="list-inline list-inline-btn">
 			{get_article_category}
 				{list}
 			{/get_article_category}
 		</ol>                 	 
 	</div>
 	<div class="sidebar-module">
-		<h5 style="font-weight: 400; font-size: 24px;">Archives</h5>
+		<h2 class="title">Archives</h2>
             <ol class="list-unstyled">
 				{get_archives_list}
 					{list}

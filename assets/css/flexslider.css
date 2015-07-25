@@ -101,7 +101,7 @@ html[xmlns] .slides {display: block;}
 
 .flex-direction-nav .flex-next {
 	right: 0px;
-	background-image: url(../images/bg_direction_nav_right.png);
+	background-image: url(../img/bg_direction_nav_right.png);
 	background-repeat: no-repeat;
 	background-position: 53% 50%;
 	-webkit-border-radius: 3px 0 0 3px;
@@ -112,7 +112,7 @@ html[xmlns] .slides {display: block;}
 
 .flex-direction-nav .flex-prev {
 	left: 0px;
-	background-image: url(../images/bg_direction_nav_left.png);
+	background-image: url(../img/bg_direction_nav_left.png);
 	background-repeat: no-repeat;
 	background-position: 47% 50%;
 	-webkit-border-radius: 0 3px 3px 0;
@@ -162,7 +162,7 @@ html[xmlns] .slides {display: block;}
 .flex-control-nav {width: 100%; text-align: center; margin-top: 20px; position: absolute; z-index: 99;}
 .flex-control-nav li {margin: 0 0 0 3px; display: inline-block; zoom: 1; *display: inline;}
 .flex-control-nav li:first-child {margin: 0;}
-.flex-control-nav li a {width: 14px; height: 14px; display: block; background: url(../images/slider_nav.png) no-repeat; cursor: pointer; text-indent: -999em;}
+.flex-control-nav li a {width: 14px; height: 14px; display: block; background: url(../img/slider_nav.png) no-repeat; cursor: pointer; text-indent: -999em;}
 .flex-control-nav li a:hover {background-position: 0 -0px;}
 .flex-control-nav li a.active {background-position: 0 -14px; cursor: default;}
 

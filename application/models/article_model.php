@@ -5,8 +5,21 @@ class Article_model extends CI_Model {
     function __construct() {
         parent:: __construct();
     }
+	
+	function create_article_stat($data){
+        $query = $this->db->query("select distinct(ip_address) 
+            from article_stat where ip_address = '".$data['ip_address']."'");
 
-    function get_article_list($flag=0, $start, $limit, $keyword='') {
+        if($query->num_rows() > 0) {
+            $this->db->where('article_id', $data['article_id']);
+            $this->db->update('article_stat', $data);
+        } else {
+            $this->db->insert('article_stat', $data);    
+        }
+		
+	}
+	
+    function get_article_list($flag=0, $start, $limit, $keyword=array()) {	
     	if($flag == 0) {
             $this->db->select("a.article_id, a.title as title_article, ac.title as title_category, a.status, a.created_date, a.modified_date", false);
         	$this->db->from("article as a");
@@ -29,6 +42,7 @@ class Article_model extends CI_Model {
 				,a.article_category_id
 				,a.image_id
 				,a.title
+				,a.tag
 				,a.summary
 				,usr.nama_lengkap
 				,DATE_FORMAT(a.created_date, '%M %d, %Y %h:%i %p') as created_date
@@ -43,10 +57,19 @@ class Article_model extends CI_Model {
 			$this->db->join('user as usr', 'a.user_id = usr.user_id', 'left');
 			$this->db->join('article_category as ac', 'ac.article_category_id = a.article_category_id', 'left');
 			$this->db->where("a.status = 'published' AND a.image_id > 0");
+			if($keyword['category']){
+				$this->db->like('ac.title', $keyword['category']); 
+			}
+			if($keyword['year']){
+				$this->db->like("DATE_FORMAT(a.created_date, '%Y')", $keyword['year']); 
+			}
+			if($keyword['month']){
+				$this->db->like("DATE_FORMAT(a.created_date, '%m')", $keyword['month']); 
+			}
 			$this->db->order_by("a.created_date", "DESC");	
 			$this->db->limit($limit, $start);  
-			 $query = $this->db->get();
-            
+			$query = $this->db->get();
+			
             if($query->num_rows() > 0) {
                 return $query;
             } 
@@ -61,9 +84,9 @@ class Article_model extends CI_Model {
         return $result;
     }
 
-    function count_article($flag=0, $keyword='') {
+    function count_article($flag=0, $keyword=array()) {
         if($flag == 0){
-			if($keyword != '') {
+			if($keyword != NULL) {
 				$this->db->like('title', $keyword);
 				$this->db->from('article');
 				return $this->db->count_all_results();
@@ -87,11 +110,19 @@ class Article_model extends CI_Model {
 				,DATE_FORMAT(a.created_date, '%m') as month
 				,DATE_FORMAT(a.created_date, '%d') as day"
 				,false);
-			$this->db->from("article as a");
+			$this->db->from("article_category as ac");
+			$this->db->join("article as a", "ac.article_category_id = a.article_category_id AND a.status = 'published' AND a.image_id > 0", "left");
 			$this->db->join('image as img', 'img.image_id = a.image_id', 'left');
 			$this->db->join('user as usr', 'a.user_id = usr.user_id', 'left');
-			$this->db->join('article_category as ac', 'ac.article_category_id = a.article_category_id', 'left');
-			$this->db->where("a.status = 'published' AND a.image_id > 0");
+			if($keyword['category']){
+				$this->db->like('ac.title', $keyword['category']); 
+			}
+			if($keyword['year']){
+				$this->db->like("DATE_FORMAT(a.created_date, '%Y')", $keyword['year']); 
+			}
+			if($keyword['month']){
+				$this->db->like("DATE_FORMAT(a.created_date, '%m')", $keyword['month']); 
+			}
 			$this->db->order_by("a.created_date", "DESC");	
 			$query = $this->db->get();
 			 
@@ -153,4 +184,62 @@ class Article_model extends CI_Model {
         $this->db->where('article_id', $id);
         $this->db->update('article', $data); 
     }
+
+    function get_rank() {
+        $query = $this->db->query("
+                    select @i:=@i+1 as i, article_id
+                    from article, (select @i:=-1) r 
+                    order by article_id desc");
+
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $row) {
+                $data[] = $row;
+            }
+            return $data;
+        }
+    }
+    
+    function get_one_row($rank) {
+        $query = $this->db->query("
+                    select n.article_id, n.title
+                    ,DATE_FORMAT(n.created_date, '%M %d, %Y %h:%i %p') as created_date
+                    ,DATE_FORMAT(n.created_date, '%Y') as year
+                    ,DATE_FORMAT(n.created_date, '%m') as month
+                    ,DATE_FORMAT(n.created_date, '%d') as day
+                    from article n order by n.article_id desc
+                    limit ". $rank .", 1 ");
+
+        if($query->num_rows() == 1) {
+            return $query->row();
+        } return false;
+    }
+	
+	function count_article_comment($id){
+		$this->db->select("COUNT(1) AS count_article_comment");
+		$this->db->from("article_comment acom");
+		$this->db->where("acom.article_id", $id);
+		
+		$query = $this->db->get();
+		
+        if($query->num_rows() == 1) {
+            return $query->row();
+        } return;
+	}
+	
+	function count_article_stat($id){
+        $query = $this->db->select("count(ip_address) as count_article_stat")
+                        ->from("(select distinct ip_address from article_stat where article_id = '".$id."') as d")
+                        ->get();
+        
+        /*$this->db->select("COUNT(ip_address) AS count_article_stat");
+		$this->db->from("article_stat astat");
+		$this->db->where("astat.article_id", $id);
+        */
+		
+		//$query = $this->db->get();
+		
+        if($query->num_rows() == 1) {
+            return $query->row();
+        } return (object) array("count_article_stat" => 0);
+	}
 }

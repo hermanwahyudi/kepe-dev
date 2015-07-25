@@ -88,7 +88,7 @@
                     </div>
                     <form id="upload-image-form" action="<?php echo base_url(); ?>admin/gallery/upload" method="post" enctype="multipart/form-data" role="form">
                         <input type="file" class = "form-control" name="userfile" size="20" onchange="read_image(this);" /><br />
-                        <input type="submit" name = "submit" value="Upload" class ="btn btn-primary" />
+                        <input type="submit" id='submit' name = "submit" value="Upload" class ="btn btn-primary" />
                     </form>
                     </div>
                     <script src="<?php echo base_url() . "ajax/upload.js"; ?>"></script>

@@ -110,6 +110,24 @@
     </div>
 </div>
 <div class="form-group">
+    <label class="col-sm-2">Contact Youtube</label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control" value="<?php echo $contact_youtube; ?>" name="contact_youtube">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2">Contact Instagram</label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control" value="<?php echo $contact_instagram; ?>" name="contact_instagram">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2">Contact Path</label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control" value="<?php echo $contact_path; ?>" name="contact_path">
+    </div>
+</div>
+<div class="form-group">
     <label class="col-sm-2">Logo</label>
     <div class="col-sm-6">
         <input type="file" name="userfile" onchange="read_image(this);">
@@ -119,7 +137,7 @@
 <div class="form-group">
     <label class="col-sm-2">Preview</label>
     <div class="col-sm-6">
-        <img id="img_prev" style="border-radius:25px; box-shadow: 10px 10px 5px #888888; max-width:95%;border:6px groove #545565;" src="<?php echo base_url() . 'assets/img/' . $logo_name;?>"  width="150" height="200"/>
+        <img id="img_prev" style="border-radius:25px; box-shadow: 10px 10px 5px #888888; max-width:95%;border:6px groove #545565;" src="<?php echo base_url() . 'assets/img/' . $logo_name;?>"/>
     </div>
 </div>
 <div class="form-group">
@@ -128,14 +146,24 @@
         <input type="text" class="form-control" value="<?php echo $background_color; ?>" name="background_color">
     </div>
 </div>
-<!--
 <div class="form-group">
-    <label class="col-sm-2">Address</label>
+    <label class="col-sm-2">Content Title</label>
     <div class="col-sm-6">
-        <textarea class="form-control" rows="3" value="<?php echo $contact_address; ?>" name="contact_address"><?php echo $contact_address; ?></textarea>    
+        <input type="text" class="form-control" value="<?php echo $content_title ?>" name="content_title">
     </div>
 </div>
--->
+<div class="form-group">
+    <label class="col-sm-2">Content Body</label>
+    <div class="col-sm-6">
+        <textarea class="form-control" rows="3" value="<?php echo $content_body; ?>" name="content_body"><?php echo $content_body; ?></textarea>    
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2">Content Mission</label>
+    <div class="col-sm-6">
+        <textarea class="form-control" rows="3" value="<?php echo $content_mission; ?>" name="content_mission"><?php echo $content_mission; ?></textarea>    
+    </div>
+</div>
 <div class="form-group">
     <label class="col-sm-2">Address</label>
     <div class="col-sm-6">

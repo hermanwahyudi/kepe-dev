@@ -52,11 +52,13 @@ $hostname = '103.247.8.138'; // Production or Staging Site
 $username = 'kepe3788_user';
 $password = '1234_asdf';
 $database = 'kepe3788_db';
+$db_debug = FALSE;
 if(strpos($host, 'localhost') || strpos($host, '127.0.0.1')) {
 	$hostname = 'localhost'; // Local Site
 	$username = 'root';
 	$password = '123456';
 	$database = 'kepe3788_db';
+	$db_debug = TRUE;
 }
 
 $active_group = 'default';
@@ -69,7 +71,7 @@ $db['default']['database'] = $database;
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;
-$db['default']['db_debug'] = TRUE;
+$db['default']['db_debug'] = $db_debug;
 $db['default']['cache_on'] = FALSE;
 $db['default']['cachedir'] = '';
 $db['default']['char_set'] = 'utf8';

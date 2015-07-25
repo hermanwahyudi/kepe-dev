@@ -1,5 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+require_once(APPPATH . 'controllers/comment.php');
+
 class Videografi extends CI_Controller {
 
 	/**
@@ -12,6 +14,7 @@ class Videografi extends CI_Controller {
 		$this->load->model('video_model','', true);
 		$this->load->model('category_video_model','', true);
 		$this->load->library("parser");
+		$this->load->library("global_common");
 		$this->load->library("pagination");
 		$this->load->library("menu");
 	}
@@ -22,19 +25,26 @@ class Videografi extends CI_Controller {
 	
 	public function index()
 	{	
-		$config = $this->table_pagination();
-		
+		$keyword = array(
+			'year' => ($this->uri->segment(3)) ? $this->uri->segment(3) : 0,
+			'month' => $this->uri->segment(4) ? $this->uri->segment(4) : 0,
+			'category' => $this->uri->segment(5) ? str_replace('%20', ' ', $this->uri->segment(5)) : 0
+		);
+
+		$config = $this->table_pagination($keyword);
 		$data = array(
 			'get_menu' => $this->menu->get_menu("header", "videografi"),
 			'get_breadcrumb' => $this->menu->get_menu("breadcrumb", "videografi"),
-			'get_video' => $this->get_video_list($config['start'], $config['per_page']),
+			'get_video' => $this->get_video_list($config['start'], $config['per_page'], $keyword),
 			'get_video_category' => $this->get_video_category_list(),
 			'get_archives_list' => $this->get_archives_list(),
-			'page' => $config['page']
+			'page' => $config['page'],
+			"title" => "Videografi",
+			"meta_tag" => "Kepo Video, KepoAbis, Kepo, Abis, Make you curious"
 		);
 		
 		$data = array_merge($this->profile()->get_about_detail(), $data);
-
+		
 		$this->generate('videografi/videografi', $data);
 	}
 	
@@ -45,66 +55,94 @@ class Videografi extends CI_Controller {
 	
 	public function generate($view, $content = array())
 	{
-		$data = $content;
-		$data['slider'] = "";
-		$data['header']  = $this->parser->parse('templates/header', $content, TRUE);
-		$data['content']  = $this->parser->parse($view, $content, TRUE);
-		$data['footer']  = $this->parser->parse('templates/footer', $content, TRUE);
+		$data = array(
+			$content,
+			'slider' => $this->menu->get_page_title($content['title']),
+			'map' => NULL,
+			'header' => $this->parser->parse('templates/header', $content, TRUE),
+			'content' => $this->parser->parse($view, $content, TRUE),
+			'footer' => $this->parser->parse('templates/footer', $content, TRUE)
+		);
+		
+		$data = array_merge($content, $data);
 		
 		$this->parser->parse('index', $data);
 	}
 	
-	public function get_video_list($start=0, $limit=10) {
-		$query = $this->video_model->get_video_list(1, $start, $limit);
-		
-		$i = 0;
-		foreach ($query->result() as $q)
-		{
-			$video_id = !isset($q->video_id) ? "" : $q->video_id;
-			$path = !isset($q->path_image) ? "" : $q->path_image;
-			$title = !isset($q->title) ? "" : $q->title;
-			$year = !isset($q->year) ? 0 : $q->year;
-			$month = !isset($q->month) ? 0 : $q->month;
-			$day = !isset($q->day) ? 0 : $q->day;
+	public function get_video_list($start=0, $limit=10, $keyword=array()) {	
+		$query = $this->video_model->get_video_list(1, $start, $limit, $keyword);
+		if($query != NULL){
+			$i = 0; $parenthesis = 1;
 			
-			$img = "<a target='_blank' href='". base_url($path) ."'>";
-			$img .= "<img class='img-responsive thumbnail' src='". base_url($path) ."' alt='".$title."' style='margin-top: 20px;'/>";
-			$img .= "</a>";
-			
-			$view = base_url('videografi/view/'.$year.'/'.$month.'/'.$day.'/'.$video_id.'/'.$this->slug($title));
-			$title = "<h5 style='min-height: 41px;'><a href='".$view."'>".$title."</a></h5>";
-			
-
-			$data[$i] = array(
-				"video_id" => $video_id,
-				"video_category_id" => !isset($q->video_category_id) ? "" : $q->video_category_id,
-				"image_id" => !isset($q->image_id) ? "" : $q->image_id,
-				"title" => $title,
-				"description" => !isset($q->description) ? "" : $q->description,
-				"path_video" => !isset($q->path_video) ? "" : $q->path_video,
-				"duration" => !isset($q->duration) ? "" : $q->duration,
-				"created_date" => !isset($q->created_date) ? "" : $q->created_date,
-				"image" => $img,
-				"category" => !isset($q->category) ? "" : $q->category
-			 );
-			 
-			 $i++;
+			foreach ($query->result() as $q)
+			{
+				$video_id = !isset($q->video_id) ? "" : $q->video_id;
+				$path = !isset($q->path_image) ? "" : $q->path_image;
+				$title = !isset($q->title) ? "" : $q->title;
+				$tag = !isset($q->tag) ? "" : $q->tag;
+				
+				$year = !isset($q->year) ? 0 : $q->year;
+				$month = !isset($q->month) ? 0 : $q->month;
+				$day = !isset($q->day) ? 0 : $q->day;
+				
+				$img = "<a target='_blank' href='". base_url($path) ."'>";
+				$img .= "<img class='img-responsive opacity' src='". base_url($path) ."' alt='".$title."'/>";
+				$img .= "</a>";
+				
+				$view = base_url('videografi/view/'.$year.'/'.$month.'/'.$day.'/'.$video_id.'/'.$this->slug($title));
+				$title = "<a data-toggle='tooltip' data-placement='top' title='".$title."' href='".$view."'>".$this->global_common->get_title(26, $title)."</a>";
+				
+				$category = !isset($q->category) ? "" : $q->category;
+				$recent_video_category = "<a href='".base_url('videografi/page/0/0/'.$category)."'>".$category."</a>";
+				
+				$open_parenthesis =  ($parenthesis % 3 == 1) ? "<div class='col-md-12'><div class='row'>" : "";
+				$closing_parenthesis = ($parenthesis % 3 == 0) ? "</div></div>" : "";
+				
+				$data[$i] = array(
+					"video_id" => $video_id,
+					"video_category_id" => !isset($q->video_category_id) ? "" : $q->video_category_id,
+					"image_id" => !isset($q->image_id) ? "" : $q->image_id,
+					"title" => $title,
+					"tag" => $this->global_common->get_list_tag($tag, 'video'),
+					"description" => !isset($q->description) ? "" : $q->description,
+					"full_name" => !isset($q->full_name) ? "" : $q->full_name,
+					"path_video" => !isset($q->path_video) ? "" : $q->path_video,
+					"duration" => !isset($q->duration) ? "" : $q->duration,
+					"created_date" => !isset($q->created_date) ? "" : $q->created_date,
+					"image" => $img,
+					"recent_video_category" => $recent_video_category,
+					"count_video_comment" => $this->video_model->count_video_comment($video_id)->count_video_comment,
+					"count_video_stat" => $this->video_model->count_video_stat($video_id)->count_video_stat,
+					"open_parenthesis" => $open_parenthesis,
+					"closing_parenthesis" => $closing_parenthesis,
+				 );
+				 
+				 $i++; $parenthesis++;
+			}
 		}
-		
- 		return $data;
+		else{
+			$data = NULL;
+		}
+ 		
+		return $data;
 	}
 	
 	public function get_video_category_list() {
 		$query = $this->category_video_model->get_category(1);
 
 		$i = 0;
+		
 		foreach ($query->result() as $q)
 		{
 			$title = !isset($q->title) ? "" : $q->title;
 			$total = !isset($q->total) ? "" : $q->total;
 			
-			$list = "<li><a href='#'>".$title." (".$total.")</a></li>";
+			$active = ($title == $this->uri->segment(5)) ? "class='active'" : "";
 			
+			$r = $this->global_common->get_length_title(5, $title);
+			
+			$list = "<li ".$active."><a href='".base_url('videografi/page/0/0/'.$title)."' data-toggle='tooltip' data-placement='top' title='".$title."(".$total.")'>".$title."</a></li>";
+
 			$data[$i] = array(
 				"video_category_id" => !isset($q->video_category_id) ? "" : $q->video_category_id,
 				"list" => $list
@@ -120,34 +158,26 @@ class Videografi extends CI_Controller {
 		$table = "video";
 		
 		$query = $this->archives_model->get_archives_list($table);
-
-		$i = 0;
-		foreach ($query->result() as $q)
-		{
-			$month = !isset($q->month) ? "" : $q->month;
-			$year = !isset($q->year) ? "" : $q->year;
-			$total = !isset($q->total) ? "" : $q->total;
-			
-			$list = "<li><a href='#'>".$month." ".$year." (".$total.")</a></li>";
-			
-			$data[$i] = array(
-				"list" => $list
-			 );
-			 
-			 $i++;
-		}
-
- 		return $data;
+	
+ 		return $this->global_common->archives($query, 'videografi');
 	}
 
 	function view($year, $month, $day, $id, $slug = "") {
 		$q = $this->video_model->get_by_id(1, $id);
 		
+		$comment = new Comment();
+		$prev_next = $this->prev_next($id);
+
  		$youtube_id = ""; $link = $q->url;
  		if(strpos($link, "v=")) {
  			$arr = explode("v=", $link);
  			$youtube_id = $arr[1];
  		}
+		
+		$title_category = $q->title_category;
+		$category = "<a href='".base_url('videografi/page/0/0/'.$title_category)."'>".$title_category."</a>";
+		
+		$tag = !isset($q->tag) ? "" : $q->tag;
 		
  		$data = array_merge(
 			$this->profile()->get_about_detail(),
@@ -156,10 +186,11 @@ class Videografi extends CI_Controller {
 	 			"get_breadcrumb" => $this->menu->get_menu("breadcrumb", "videografi"),
 	 			"get_video_category" => $this->get_video_category_list(),
 	 			"get_archives_list" => $this->get_archives_list(),
-	 			"get_video" => $this->get_video_list(0, 5),
- 				"title_category" => "<a href='#'>".$q->title_category."</a>",
+	 			"get_video" => $this->get_video_list(0, 5, NULL),
+ 				"title_category" => $category,
 	            "title" => $q->title_video,
-	            "tag" => $q->tag,
+	            "tag" => $this->global_common->get_list_tag($tag, 'video', 'btn'),
+	            "meta_tag" => $this->global_common->get_list_tag($tag, 'video', 'metadata'),
 	            "status" => $q->status,
 	            "description" => $q->description,
 	            "story_ide" => $q->story_ide,
@@ -171,13 +202,57 @@ class Videografi extends CI_Controller {
 	            "duration" => $q->duration,
 				"full_name" => $q->full_name,
 	            "created_date" => $q->created_date,
-	            "modified_date" => $q->modified_date
+	            "modified_date" => $q->modified_date,
+	            "get_comment" => $comment->get_comment("video", $id),
+ 				"n1" => $comment->random_set_captcha(0),
+ 				"op" => $comment->random_set_captcha(),
+ 				"n2" => $comment->random_set_captcha(0),
+ 				"prev_next" => $prev_next,
+ 				"video_id" => $id,
+				"count_video_comment" => $this->video_model->count_video_comment($id)->count_video_comment,
+				"count_video_stat" => $this->video_model->count_video_stat($id)->count_video_stat
 	        )
 		);
-
+		
+		$this->video_model->create_video_stat($this->global_common->stat('video_id', $id));
+		
  		$this->generate('videografi/view', $data);
 	}
 	
+	function prev_next($current_id) {
+		$result = $this->video_model->get_rank();
+		$count = $this->video_model->count_video();
+		$rank = 0;
+		foreach($result as $k) {
+			if($current_id == $k->video_id) {
+				$rank = $k->i;
+				break;
+			}
+		}
+		
+		if($rank > 0 && $rank < $count-1) {
+			$p = $this->video_model->get_one_row($rank-1);
+			$prev = "<li><a href='". base_url("videografi/view/" .  $p->year.'/'.$p->month.'/'.$p->day.'/'.$p->video_id . "/" . $this->slug($p->title) . "")."'"
+					."aria-label='Previous'><span aria-hidden='true'>&laquo; Previous</span></a></li>";
+			$p = $this->video_model->get_one_row($rank+1);
+			$next = "<li><a href='".base_url("videografi/view/" .  $p->year.'/'.$p->month.'/'.$p->day.'/'.$p->video_id . "/" . $this->slug($p->title) . "")."'"
+					."aria-label='Next'><span aria-hidden='true'>Next &raquo;</span></a></li>";
+			return $prev . $next;
+		}
+		if($count-1 == $rank) {
+			$p = $this->video_model->get_one_row($rank-1);
+			$prev = "<li><a href='". base_url("videografi/view/" .  $p->year.'/'.$p->month.'/'.$p->day.'/'.$p->video_id . "/" . $this->slug($p->title) . "")."'"
+					."aria-label='Previous'><span aria-hidden='true'>&laquo; Previous</span></a></li>";
+			return $prev;
+		} 
+		if($rank == 0) {
+			$p = $this->video_model->get_one_row($rank+1);
+			$next = "<li><a href='".base_url("videografi/view/" .  $p->year.'/'.$p->month.'/'.$p->day.'/'.$p->video_id . "/" . $this->slug($p->title) . "")."'"
+					."aria-label='Next'><span aria-hidden='true'>Next &raquo;</span></a></li>";
+			return $next;
+		}
+	}
+
 	function profile(){
 		include ('about.php');
 		
@@ -185,24 +260,20 @@ class Videografi extends CI_Controller {
 	}
 	
 	function slug($str='') {
-		return strtolower(preg_replace('/\s/', '-', $str));
+		return strtolower(preg_replace('/[\s\/\&\%\#\,\.\)\(\$]/', '-', $str));
 	}
 	
 	function page() {
-	 	if(!$this->uri->segment(3)) {
-	 		redirect("videografi");
-	 	} else {
-	 		$this->index();	
-	 	}
+	 	$this->index();	
 	 }
 	
-	 function table_pagination(){
-		$config['base_url'] = base_url("videografi/page/");
-		$config['per_page'] = 4;
-		$config['total_rows'] = $this->video_model->count_video(1);
-		$config['uri_segment'] = 3;
-		$config['next_link'] = '&gt;';
-		$config['prev_link'] = '&lt;';
+	 function table_pagination($keyword){
+		$config['base_url'] = base_url("videografi/page/".$keyword['year'] ."/".$keyword['month'].'/'.$keyword['category']);
+		$config['per_page'] = 9;
+		$config['total_rows'] = $this->video_model->count_video(1, $keyword);
+		$config['uri_segment'] = 6;
+		$config['next_link'] = 'Next &raquo;';
+		$config['prev_link'] = '&laquo; Previous';
 		$config['first_link'] = '&lt;&lt;';
 		$config['last_link'] = '&gt;&gt;';
 		$config['cur_tag_open'] = '<span><b>';

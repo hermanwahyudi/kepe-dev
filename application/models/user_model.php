@@ -36,10 +36,17 @@ class User_model extends CI_Model {
         return false;
     }
 
-    function get_user_list($start, $limit) {
-        $this->db->limit($limit, $start);
+    function get_user_list($start, $limit, $flag=0) {
 		$this->db->select('u.*, urb.role_name AS user_role');
-        $this->db->order_by("user_id", "desc");
+		 if($flag == 0){
+			$this->db->order_by("user_id", "desc");
+			$this->db->limit($limit, $start);
+		 }
+		 else{
+			$this->db->order_by("nama_lengkap", "asc");
+			$this->db->where("role_name", "crew");
+			$this->db->or_where("role_name", "admin");
+		 }
         $this->db->from("user u");
         $this->db->join("user_role_basic urb","urb.user_role_basic_id = u.user_role_basic_id");
         $query = $this->db->get();
@@ -66,17 +73,9 @@ class User_model extends CI_Model {
     }
 
     function create_user($data) {
-        $data = array("user_name" => $data['user_name'],
-                    "password" => md5($data['password']),
-                    "email" => $data['email'],
-                    "nama_lengkap" => $data['nama_lengkap'],
-                    "user_role_basic_id" => $data['user_role_basic_id'],
-                    "position" => $data['position'],
-                    "body" => $data['body'],
-                    "created_date" => date("Y-m-d H:i:s"),
-                    "modified_date" => date("Y-m-d H:i:s"),
-                    "image" => $data['image']
-                );
+        $data["password"] = md5($data['password']);
+        $data["created_date"] = date("Y-m-d H:i:s");
+        $data["modified_date"] = date("Y-m-d H:i:s");
 		
         $this->db->insert('user', $data);
     }
@@ -112,7 +111,24 @@ class User_model extends CI_Model {
     }
 
     function get_by_id($id) {
-        $this->db->select('u.user_id, u.user_role_basic_id, urb.role_name AS user_role, u.user_name, u.nama_lengkap, u.email, u.position, u.body, u.image, u.created_date, u.modified_date');
+        $this->db->select("
+			u.user_id
+			, u.user_role_basic_id
+			, urb.role_name AS user_role
+			, DATE_FORMAT(u.date_of_birth, '%M %d, %Y') as date_of_birth_modified
+			, u.date_of_birth
+			, u.place_of_birth
+			, u.user_name
+			, u.nama_lengkap
+			, u.email
+			, u.phone_number
+			, u.address
+			, u.position
+			, u.body
+			, u.image
+			, u.created_date
+			, u.modified_date
+		",false);
         $this->db->from('user u');
         $this->db->join("user_role_basic urb","urb.user_role_basic_id = u.user_role_basic_id");
         $this->db->where("user_id", $id);

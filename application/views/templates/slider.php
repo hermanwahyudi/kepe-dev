@@ -1,3 +1,12 @@
+<style>
+	.slider_description {
+		color: #ccc;
+	}
+	
+	.slider_description p {
+		margin-bottom: 0px;
+	}
+</style>
 <!-- Slider -->
 <div id="slider" style="background: rgba(0, 0, 0, 0) linear-gradient(to bottom, #4c0000 0%, #870000 10%, #870000 100%) repeat scroll 0 0;">
 
@@ -10,7 +19,7 @@
 					<div class="seven columns">
 						<div class="slider_description">
 							<h2 style="color: #fff;">{title}</h2>
-							<p style="color: #fff;">{description}</p>
+							<div style="margin-bottom: 10px;">{description}</div>
 								{url}
 						</div>
 					</div>

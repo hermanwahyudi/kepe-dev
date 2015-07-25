@@ -39,10 +39,14 @@ class Article extends CI_Controller {
 	function get_list_article($start, $limit, $keyword='') {
 		$result = $this->article_model->get_article_list(0, $start, $limit, $keyword);
 	 	$data_array = ""; $i = 1;
+		$number = 0;
+
 	 	if($result) {
 	 		foreach($result as $row) {
+				$number =  $start + $i;
+				
 		 		$id = $row->article_id;
-	        	$data_array .= "<tr><td>" . $id . "</td>";
+	        	$data_array .= "<tr><td>" . $number . "</td>";
 	        	$data_array .= "<td>" . $row->title_category . "</td>";
 	        	$data_array .= "<td>" . $row->title_article . "</td>";
 	        	$data_array .= "<td>" . $row->status . "</td>";
@@ -159,6 +163,7 @@ class Article extends CI_Controller {
 		$uploaded = $this->upload->do_upload();
 		$data = $this->upload->data();
 		if($uploaded) {
+			chmod($data['full_path'], 0777);
 			return array("is_uploaded" => true, 
 					"data" => $data);
 		} return array("is_uploaded" => false, 
